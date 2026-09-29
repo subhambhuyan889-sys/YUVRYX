@@ -7,7 +7,7 @@
 <meta name="description" content="YUVRYX is a growing platform designed to help people learn, build skills, discover opportunities, work toward goals, manage life and unlock practical benefits in one connected ecosystem.">
 <style>
 :root{--bg:#f6f8fc;--card:#fff;--ink:#101828;--muted:#667085;--line:#e6eaf0;--brand:#5b5bd6;--brand2:#7c3aed;--dark:#111827;--ok:#067647;--warn:#b54708;--shadow:0 10px 35px rgba(16,24,40,.07);--r:18px}
-html,body{max-width:100%;overflow-x:hidden}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}button,input{font:inherit}button{cursor:pointer}
+html,body{max-width:100%;overflow-x:hidden} body.yx-auth-locked .app{display:none!important}body.yx-auth-locked .yx-auth-overlay{display:grid!important}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}button,input{font:inherit}button{cursor:pointer}
 .app{display:flex;min-height:100vh}.side{position:fixed;left:0;top:0;bottom:0;width:270px;background:#fff;border-right:1px solid var(--line);z-index:30;display:flex;flex-direction:column}.brand{padding:20px 18px;border-bottom:1px solid var(--line);display:flex;gap:12px;align-items:center}
 .logo{width:43px;height:43px;border-radius:13px;background:#111827;color:#fff;display:grid;place-items:center;font-weight:950;font-size:18px;letter-spacing:-2px;position:relative}.logo:after{content:"";position:absolute;inset:5px;border:1px solid rgba(255,255,255,.28);border-radius:9px}
 .brand strong{font-size:20px;letter-spacing:2px}.brand small{display:block;color:#98a2b3;font-size:8px;letter-spacing:.09em;margin-top:2px}.nav{overflow:auto;padding:10px;flex:1}.label{font-size:9px;font-weight:850;color:#98a2b3;text-transform:uppercase;letter-spacing:.12em;padding:14px 10px 6px}.nav button{width:100%;border:0;background:transparent;color:#475467;text-align:left;padding:9px 10px;border-radius:10px;font-size:12px;display:flex;gap:10px;align-items:center}.nav button:hover{background:#f2f4f7}.nav button.active{background:#eeecff;color:#5147e5;font-weight:800}.ni{width:19px;text-align:center}.sideBottom{padding:12px;border-top:1px solid var(--line)}.plan{background:#111827;color:#fff;padding:13px;border-radius:14px}.plan small{color:#cbd5e1}.plan button{margin-top:9px;width:100%;border:0;padding:8px;border-radius:9px;font-weight:800}
@@ -100,7 +100,7 @@ html{scroll-behavior:smooth}
 .yx-ripple{position:relative;overflow:hidden}.yx-ripple span{position:absolute;border-radius:50%;transform:scale(0);background:rgba(255,255,255,.28);animation:yxRipple .65s linear;pointer-events:none}@keyframes yxRipple{to{transform:scale(5);opacity:0}}
 </style>
 </head>
-<body><div class="app">
+<body class="yx-auth-locked"><div class="app">
 <aside class="side" id="side">
  <div class="brand"><div class="logo">Y</div><div><strong>YUVRYX</strong><small>THE LIMITLESS POWER OF YOUTH</small></div></div>
  <nav class="nav">
@@ -334,6 +334,7 @@ function filterBenefits(q){const x=(q||'').toLowerCase().trim();document.querySe
     setTimeout(()=>document.getElementById('yxEmail')?.focus(),50);
   };
   window.closeAuth=function(){
+    if(document.body.classList.contains('yx-auth-locked'))return;
     document.getElementById('yxAuth').style.display='none';
     document.getElementById('yxAuth').setAttribute('aria-hidden','true');
   };
@@ -389,7 +390,9 @@ function filterBenefits(q){const x=(q||'').toLowerCase().trim();document.querySe
   function renderSession(user){
     const top=document.getElementById('yxAuthTop'), avatar=document.getElementById('yxAvatar');
     if(!top||!avatar)return;
-    if(user){
+    const verified=!!(user && (user.app_metadata?.provider==='google' || user.email_confirmed_at));
+    if(user && verified){
+      document.body.classList.remove('yx-auth-locked');
       const name=user.user_metadata?.full_name || user.email?.split('@')[0] || 'Student';
       top.textContent=name;
       avatar.textContent=name.trim().charAt(0).toUpperCase()||'Y';
@@ -399,13 +402,18 @@ function filterBenefits(q){const x=(q||'').toLowerCase().trim();document.querySe
       document.querySelector('.yx-google').style.display='none';
       document.getElementById('yxAuthForm').style.display='none';
       document.getElementById('yxAuthSub').textContent='Your YUVRYX account is connected.';
+      document.getElementById('yxAuth').style.display='none';
+      document.getElementById('yxAuth').setAttribute('aria-hidden','true');
     }else{
+      document.body.classList.add('yx-auth-locked');
       top.textContent='Sign in'; avatar.textContent='Y';
       document.getElementById('yxSession').style.display='none';
       document.getElementById('yxAuthForm').style.display='grid';
       document.getElementById('yxAuthSubmit').style.display='block';
       document.querySelector('.yx-google').style.display='block';
-      document.getElementById('yxAuthSub').textContent='One account for your student journey.';
+      document.getElementById('yxAuthSub').textContent=user ? 'Please verify your email first. Check your inbox and click the verification link.' : 'First sign in or create your YUVRYX account to continue.';
+      document.getElementById('yxAuth').style.display='grid';
+      document.getElementById('yxAuth').setAttribute('aria-hidden','false');
     }
   }
   async function init(){
