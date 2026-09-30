@@ -423,4 +423,69 @@ function filterBenefits(q){const x=(q||'').toLowerCase().trim();document.querySe
   window.addEventListener('load',init);
 })();
 </script>
+<script id="yuvryx-live-bridge">
+(function(){
+  function waitSB(){ return window.supabase && window.supabase.createClient; }
+  const URL='https://vjcwskqilrpetfcocurr.supabase.co';
+  const KEY='sb_publishable_bBdNo7Tw3P7cckMlO727gQ_TeWWO4-u';
+  let live=null;
+  function client(){ if(!live&&waitSB()) live=window.supabase.createClient(URL,KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}}); return live; }
+  async function user(){ const s=client(); if(!s)return null; const {data}=await s.auth.getSession(); return data.session?.user||null; }
+  function esc(x){return String(x??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));}
+  function requireUser(){return user().then(u=>{if(!u){openAuth();toast('Please sign in to use this feature.');}return u;});}
+
+  async function renderLiveCommunity(){
+    const v=document.getElementById('community'); if(!v)return;
+    const s=client(); if(!s)return;
+    const {data,error}=await s.from('community_posts').select('id,title,content,category,created_at').order('created_at',{ascending:false}).limit(30);
+    const posts=data||[];
+    v.innerHTML='<div class="title"><div><div class="eyebrow">Community</div><h2>Student Community</h2><p>Real posts are stored in YUVRYX and protected by Supabase RLS.</p></div><button class="btn primaryBtn" id="yxNewPost">+ New Post</button></div><div class="card" id="yxPostForm" style="display:none"><input id="yxPostTitle" placeholder="Post title" style="width:100%;padding:10px;margin-bottom:8px"><textarea id="yxPostBody" placeholder="Write something useful for students..." style="width:100%;min-height:100px;padding:10px"></textarea><button class="btn primaryBtn" id="yxPostSave" style="margin-top:8px">Publish</button></div><div class="tiles" id="yxPosts">'+(error?'<div class="tile">Unable to load community right now.</div>':posts.length?posts.map(p=>'<article class="tile"><b>'+esc(p.title)+'</b><p>'+esc(p.content)+'</p><small>'+esc(p.category||'General')+' · '+new Date(p.created_at).toLocaleString()+'</small></article>').join(''):'<div class="tile"><b>No posts yet.</b><p>Create the first student discussion.</p></div>')+'</div>';
+    document.getElementById('yxNewPost').onclick=()=>document.getElementById('yxPostForm').style.display='block';
+    document.getElementById('yxPostSave').onclick=async()=>{const u=await requireUser();if(!u)return;const title=document.getElementById('yxPostTitle').value.trim(),content=document.getElementById('yxPostBody').value.trim();if(!title||!content)return toast('Add a title and message.');const {error:e}=await s.from('community_posts').insert({user_id:u.id,title,content,category:'General'});if(e)toast(e.message);else{toast('Post published.');renderLiveCommunity();}};
+  }
+
+  async function renderLiveGroups(){
+    const v=document.getElementById('group');if(!v)return;
+    const s=client();if(!s)return;
+    const {data:groups}=await s.from('study_groups').select('id,name,description,subject,visibility,created_at').order('created_at',{ascending:false}).limit(30);
+    v.innerHTML='<div class="title"><div><div class="eyebrow">Live collaboration</div><h2>Group Study</h2><p>Create and discover real study rooms. Messages are stored in Supabase.</p></div><button class="btn primaryBtn" id="yxCreateGroup">+ Create Group</button></div><div class="card" id="yxGroupForm" style="display:none"><input id="yxGroupName" placeholder="Group name" style="width:100%;padding:10px;margin-bottom:8px"><input id="yxGroupSubject" placeholder="Subject" style="width:100%;padding:10px;margin-bottom:8px"><textarea id="yxGroupDesc" placeholder="What will this group study?" style="width:100%;padding:10px"></textarea><button class="btn primaryBtn" id="yxGroupSave" style="margin-top:8px">Create</button></div><div class="tiles">'+((groups||[]).length?(groups||[]).map(g=>'<article class="tile"><b>'+esc(g.name)+'</b><p>'+esc(g.description||'')+'</p><small>'+esc(g.subject||'General')+' · '+esc(g.visibility||'discoverable')+'</small><br><button class="btn" onclick="yxJoinGroup(\''+g.id+'\')">Join</button></article>').join(''):'<div class="tile"><b>No study groups yet.</b><p>Create one and start collaborating.</p></div>')+'</div>';
+    document.getElementById('yxCreateGroup').onclick=()=>document.getElementById('yxGroupForm').style.display='block';
+    document.getElementById('yxGroupSave').onclick=async()=>{const u=await requireUser();if(!u)return;const name=document.getElementById('yxGroupName').value.trim(),subject=document.getElementById('yxGroupSubject').value.trim(),description=document.getElementById('yxGroupDesc').value.trim();if(!name)return toast('Group name is required.');const {data,error}=await s.from('study_groups').insert({owner_id:u.id,name,subject,description,visibility:'discoverable'}).select('id').single();if(error)toast(error.message);else{await s.from('study_group_members').insert({group_id:data.id,user_id:u.id,member_role:'owner'});toast('Study group created.');renderLiveGroups();}};
+  }
+  window.yxJoinGroup=async function(id){const u=await requireUser();if(!u)return;const s=client();const {error}=await s.from('study_group_members').upsert({group_id:id,user_id:u.id,member_role:'member'},{onConflict:'group_id,user_id'});toast(error?error.message:'Joined study group.');};
+
+  async function renderLiveTests(){
+    const v=document.getElementById('test');if(!v)return;const s=client();if(!s)return;
+    const {data:tests}=await s.from('surprise_tests').select('id,title,course,subject,starts_at,ends_at,duration_minutes,status,prize_info').order('starts_at',{ascending:true}).limit(30);
+    v.innerHTML='<div class="title"><div><div class="eyebrow">Live assessment</div><h2>Surprise Tests</h2><p>Tests shown here come from the production database.</p></div></div><div class="tiles">'+((tests||[]).length?(tests||[]).map(t=>'<article class="tile"><b>'+esc(t.title)+'</b><p>'+esc(t.course||'')+' · '+esc(t.subject||'')+'</p><small>'+new Date(t.starts_at).toLocaleString()+' · '+esc(t.status||'scheduled')+' · '+esc(t.duration_minutes)+' min</small><br><button class="btn" onclick="yxTestInfo(\''+t.id+'\')">View Test</button></article>').join(''):'<div class="tile"><b>No live tests scheduled.</b><p>Admins can publish tests from the backend.</p></div>')+'</div>';
+  }
+  window.yxTestInfo=async function(id){const s=client();const {data,error}=await s.from('surprise_tests').select('*').eq('id',id).single();if(error)toast(error.message);else toast(data.status==='live'?'Test is live — open the assessment flow from the test card.':'Test is not live yet.');};
+
+  async function renderLiveNotices(){
+    const v=document.getElementById('notice');if(!v)return;const s=client();if(!s)return;
+    const {data}=await s.from('notices').select('id,title,body,category,published_at,expires_at').eq('published',true).order('published_at',{ascending:false}).limit(30);
+    v.innerHTML='<div class="title"><div><div class="eyebrow">Live updates</div><h2>Notice Board</h2><p>Published notices from the YUVRYX backend.</p></div></div><div class="tiles">'+((data||[]).length?(data||[]).map(n=>'<article class="tile"><span class="badge">'+esc(n.category||'INFO')+'</span><b>'+esc(n.title)+'</b><p>'+esc(n.body)+'</p><small>'+new Date(n.published_at||Date.now()).toLocaleString()+'</small></article>').join(''):'<div class="tile"><b>No published notices.</b></div>')+'</div>';
+  }
+
+  async function renderLiveChampions(){
+    const box=document.getElementById('leaderboard');if(!box)return;const s=client();if(!s)return;
+    const {data,error}=await s.from('leaderboard_entries').select('display_name,score,rank,verified').eq('verified',true).order('rank',{ascending:true}).limit(50);
+    if(error){box.innerHTML='<div class="tile">Leaderboard unavailable.</div>';return;}
+    box.innerHTML='<div class="rankrow headr"><span>Rank</span><span>Student</span><span>Score</span><span>Verified</span></div>'+((data||[]).map(x=>'<div class="rankrow"><b>#'+esc(x.rank)+'</b><span>'+esc(x.display_name)+'</span><b>'+esc(Number(x.score).toFixed(1))+'</b><span>✓</span></div>').join('')||'<div class="tile">No verified leaderboard entries yet.</div>');
+  }
+
+  const originalShow=window.show;
+  window.show=function(id){
+    const r=originalShow(id);
+    if(id==='community')renderLiveCommunity();
+    if(id==='group')renderLiveGroups();
+    if(id==='test')renderLiveTests();
+    if(id==='notice')renderLiveNotices();
+    if(id==='champions')renderLiveChampions();
+    return r;
+  };
+
+  window.addEventListener('load',()=>setTimeout(()=>{if(document.getElementById('community')){}},500));
+})();
+</script>
 </body></html>
