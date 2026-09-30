@@ -717,4 +717,65 @@ function filterBenefits(q){const x=(q||'').toLowerCase().trim();document.querySe
   window.addEventListener('load',()=>setTimeout(()=>{freeMode()},100));
 })();
 </script>
+
+<script id="yuvryx-core-actions">
+(function(){
+  const URL='https://vjcwskqilrpetfcocurr.supabase.co',KEY='sb_publishable_bBdNo7Tw3P7cckMlO727gQ_TeWWO4-u';
+  let sb=null;
+  const S=()=>{if(!sb&&window.supabase?.createClient)sb=window.supabase.createClient(URL,KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});return sb};
+  const U=async()=>{const s=S();if(!s)return null;const q=await s.auth.getSession();return q.data.session?.user||null};
+  const esc=x=>String(x??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+  const open=(t,s,h,k='YUVRYX')=>window.yxOpenFeature?.(t,s,h,k);
+  
+  document.addEventListener('click',e=>{
+    const post=e.target.closest('#community .tile');
+    if(post&&!e.target.closest('button')){
+      const b=post.querySelector('b'),p=post.querySelector('p');if(b)open(b.textContent.trim(),'Community post', '<div class="card"><p>'+esc(p?.textContent||'')+'</p></div>','COMMUNITY');
+    }
+    const b=e.target.closest('#goals .title .primaryBtn');
+    if(b){e.preventDefault();newGoal()}
+    const np=e.target.closest('#projects .title .primaryBtn');
+    if(np){e.preventDefault();newProject()}
+    const aa=e.target.closest('#applications .title .primaryBtn');
+    if(aa){e.preventDefault();newApplication()}
+  });
+
+  async function newGoal(){
+    const u=await U();if(!u){openAuth();return}
+    open('Create a goal','Save it to your YUVRYX goals.','<form class="yx-form" id="yxGoalForm"><input id="yxGoalTitle" placeholder="Goal title" required><input id="yxGoalCategory" placeholder="Category e.g. Internship"><input id="yxGoalDate" type="date"><textarea id="yxGoalDesc" placeholder="What do you want to achieve?"></textarea><button class="btn primaryBtn">Save goal</button></form>','GOALS');
+    document.getElementById('yxGoalForm').onsubmit=async e=>{e.preventDefault();const q=await S().from('goals').insert({user_id:u.id,title:document.getElementById('yxGoalTitle').value.trim(),category:document.getElementById('yxGoalCategory').value.trim(),target_date:document.getElementById('yxGoalDate').value||null,description:document.getElementById('yxGoalDesc').value.trim(),progress:0,status:'active'});if(q.error)toast(q.error.message);else{toast('Goal saved.');window.yxCloseFeature()}}
+  }
+
+  async function newProject(){
+    const u=await U();if(!u){openAuth();return}
+    open('Create a project','Save a real project to your portfolio.','<form class="yx-form" id="yxProjectForm"><input id="yxProjectTitle" placeholder="Project title" required><textarea id="yxProjectDesc" placeholder="Problem, solution and stack"></textarea><input id="yxProjectGit" placeholder="GitHub URL"><input id="yxProjectDemo" placeholder="Demo URL"><button class="btn primaryBtn">Save project</button></form>','PROJECT STUDIO');
+    document.getElementById('yxProjectForm').onsubmit=async e=>{e.preventDefault();const q=await S().from('projects').insert({user_id:u.id,title:document.getElementById('yxProjectTitle').value.trim(),description:document.getElementById('yxProjectDesc').value.trim(),github_url:document.getElementById('yxProjectGit').value.trim()||null,demo_url:document.getElementById('yxProjectDemo').value.trim()||null,status:'planning'});if(q.error)toast(q.error.message);else{toast('Project saved.');window.yxCloseFeature()}}
+  }
+
+  async function newApplication(){
+    const u=await U();if(!u){openAuth();return}
+    const q=await S().from('opportunities').select('id,title,organization').eq('status','active').order('created_at',{ascending:false}).limit(30);
+    const opts=(q.data||[]).map(x=>'<option value="'+esc(x.id)+'">'+esc(x.title)+' — '+esc(x.organization)+'</option>').join('');
+    open('Add application','Track a real application in your command center.','<form class="yx-form" id="yxApplicationForm"><select id="yxOpp">'+(opts||'<option value="">No active opportunities</option>')+'</select><select id="yxStatus"><option>applied</option><option>under_review</option><option>interview</option><option>selected</option><option>rejected</option></select><textarea id="yxAppNotes" placeholder="Notes"></textarea><button class="btn primaryBtn">Save application</button></form>','APPLICATIONS');
+    document.getElementById('yxApplicationForm').onsubmit=async e=>{e.preventDefault();const q=await S().from('applications').insert({user_id:u.id,opportunity_id:document.getElementById('yxOpp').value||null,status:document.getElementById('yxStatus').value,applied_at:new Date().toISOString(),notes:document.getElementById('yxAppNotes').value});if(q.error)toast(q.error.message);else{toast('Application saved.');window.yxCloseFeature()}}
+  }
+
+  async function renderCareer(){
+    const v=document.getElementById('career');if(!v)return;const q=await S().from('opportunities').select('id,title,organization,type,description,official_url,location,work_mode,deadline,eligibility,verified,status').eq('status','active').order('deadline',{ascending:true}).limit(30);
+    v.innerHTML='<div class="title"><div><div class="eyebrow">Opportunity Engine · LIVE</div><h2>Career & Opportunities</h2><p>Real opportunities from the YUVRYX database.</p></div><button class="btn primaryBtn" id="yxRefreshCareer">Refresh matches</button></div><div class="card"><div class="yx-feature-list" id="yxCareerList"></div></div>';
+    const box=document.getElementById('yxCareerList');
+    if(q.error||!q.data?.length){box.innerHTML='<div class="yx-feature-item"><b>No active opportunities yet.</b><p>Once an opportunity is added by the admin side, it will appear here with its official link.</p></div>'}
+    else q.data.forEach(x=>{const a=document.createElement('div');a.className='yx-feature-item';a.innerHTML='<b>'+esc(x.title)+'</b><p>'+esc(x.organization)+' · '+esc(x.type)+' · '+esc(x.work_mode||'')+' · '+esc(x.location||'')+'</p><div class="yx-feature-actions"><button class="btn primaryBtn">View & Apply</button>'+(x.official_url?'<a class="btn" href="'+esc(x.official_url)+'" target="_blank" rel="noopener">Official link</a>':'')+'</div>';a.querySelector('button').onclick=()=>openCareer(x);box.appendChild(a)});
+    document.getElementById('yxRefreshCareer').onclick=renderCareer;
+  }
+  async function openCareer(x){
+    const u=await U();
+    open(x.title,esc(x.organization)+' · '+esc(x.type),'<div class="yx-feature-item"><p>'+esc(x.description||'')+'</p><p><b>Eligibility:</b> '+esc(x.eligibility||'Not specified')+'</p><p><b>Deadline:</b> '+(x.deadline?new Date(x.deadline).toLocaleString():'Not specified')+'</p></div><div class="yx-feature-actions"><button class="btn primaryBtn" id="yxApplyNow">'+(u?'Apply / save application':'Sign in to apply')+'</button>'+(x.official_url?'<a class="btn" href="'+esc(x.official_url)+'" target="_blank" rel="noopener">Open official link</a>':'')+'</div>','CAREER');
+    document.getElementById('yxApplyNow').onclick=async()=>{if(!u){openAuth();return}const q=await S().from('applications').insert({user_id:u.id,opportunity_id:x.id,status:'applied',applied_at:new Date().toISOString()});toast(q.error?q.error.message:'Application saved.');if(!q.error)window.yxCloseFeature()}
+  }
+
+  const oldShow=window.show;
+  window.show=function(id){const r=oldShow(id);setTimeout(()=>{if(id==='career')renderCareer()},50);return r};
+})();
+</script>
 </body>
