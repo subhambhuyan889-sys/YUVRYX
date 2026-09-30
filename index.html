@@ -288,13 +288,12 @@ function filterBenefits(q){const x=(q||'').toLowerCase().trim();document.querySe
       <div id="yxSignupFields" style="display:none">
         <label>Full Name *<input id="yxFullName" autocomplete="name" required></label>
         <label>Mobile Number *<input id="yxPhone" type="tel" autocomplete="tel" required></label>
-        <label>Course / Degree *<input id="yxCourse" required placeholder="e.g. BTech"></label>
-        <label>Stream / Specialization *<input id="yxStream" required placeholder="e.g. CSE AI & DS"></label>
-        <label>Current Year / Semester *<input id="yxSemester" required placeholder="e.g. 2nd Year / 3rd Semester"></label>
+        <label>Gender *<select id="yxGender" required><option value="">Select gender</option><option value="male">Male</option><option value="female">Female</option><option value="non_binary">Non-binary</option><option value="prefer_not_to_say">Prefer not to say</option></select></label>
       </div>
       <label>Email *<input id="yxEmail" type="email" autocomplete="email" required></label>
       <label>Password *<input id="yxPassword" type="password" autocomplete="current-password" minlength="8" required></label>
       <label id="yxTermsRow" style="display:none" class="yx-check"><input id="yxTerms" type="checkbox"> <span>I agree to the Terms & Privacy Policy.</span></label>
+      <small id="yxTrialNote" class="yx-auth-note" style="display:none">Email verification activates your account and starts your 7-day YUVRYX trial. No mobile OTP is required.</small>
       <button class="yx-auth-primary" type="submit" id="yxAuthSubmit">Sign in</button>
     </form>
     <button class="yx-google" onclick="signInWithGoogle()">Continue with Google</button>
@@ -322,6 +321,7 @@ function filterBenefits(q){const x=(q||'').toLowerCase().trim();document.querySe
     authView=mode;
     document.getElementById('yxSignupFields').style.display=mode==='signup'?'grid':'none';
     document.getElementById('yxTermsRow').style.display=mode==='signup'?'flex':'none';
+    document.getElementById('yxTrialNote').style.display=mode==='signup'?'block':'none';
     document.getElementById('yxLoginTab').classList.toggle('active',mode==='login');
     document.getElementById('yxSignupTab').classList.toggle('active',mode==='signup');
     document.getElementById('yxAuthSubmit').textContent=mode==='signup'?'Create account':'Sign in';
@@ -347,14 +347,12 @@ function filterBenefits(q){const x=(q||'').toLowerCase().trim();document.querySe
         if(!document.getElementById('yxTerms').checked){setMsg('Please accept the Terms & Privacy Policy.');return false;}
         const full_name=document.getElementById('yxFullName').value.trim();
         const phone=document.getElementById('yxPhone').value.trim();
-        const course=document.getElementById('yxCourse').value.trim();
-        const stream=document.getElementById('yxStream').value.trim();
-        const semester=document.getElementById('yxSemester').value.trim();
+        const gender=document.getElementById('yxGender').value;
         const {data,error}=await sb.auth.signUp({
           email,password,
           options:{
             emailRedirectTo:'https://subhambhuyan889-sys.github.io/YUVRYX/',
-            data:{full_name,phone,course,stream,semester}
+            data:{full_name,phone,gender}
           }
         });
         if(error)throw error;
