@@ -952,8 +952,9 @@ function filterBenefits(q){const x=(q||'').toLowerCase().trim();document.querySe
     });
   }
   window.addEventListener('load',()=>{freePlans();window.applyPaidLocks();wireTiles();setTimeout(wireTiles,900);});
-  const obs=new MutationObserver(()=>{freePlans();window.applyPaidLocks();wireTiles();});
+  const obs=new MutationObserver(()=>{window.applyPaidLocks();wireTiles();});
   obs.observe(document.body,{childList:true,subtree:true});
+  setInterval(()=>{if(document.getElementById('plans')?.classList.contains('active'))freePlans();},1500);
 
   /* Stop generic fake "ready to configure" feedback from firing on new interactive controls. */
   const oldToast=window.toast;
