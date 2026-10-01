@@ -778,4 +778,186 @@ function filterBenefits(q){const x=(q||'').toLowerCase().trim();document.querySe
   window.show=function(id){const r=oldShow(id);setTimeout(()=>{if(id==='career')renderCareer()},50);return r};
 })();
 </script>
+<script id="yuvryx-free-interactive-v7">
+(function(){
+  const SB_URL='https://vjcwskqilrpetfcocurr.supabase.co';
+  const SB_KEY='sb_publishable_bBdNo7Tw3P7cckMlO727gQ_TeWWO4-u';
+  let sb=null;
+  function db(){ if(!sb && window.supabase?.createClient) sb=window.supabase.createClient(SB_URL,SB_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}}); return sb; }
+  function esc(x){return String(x??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));}
+  function currentUser(){return db()?.auth.getSession().then(x=>x.data.session?.user||null);}
+  function needUser(){return currentUser().then(u=>{if(!u){if(typeof openAuth==='function')openAuth();toast('Please sign in first.');}return u;});}
+
+  /* LAUNCH MODE: payments/subscription enforcement are intentionally disabled. */
+  window.applyPaidLocks=function(){
+    document.querySelectorAll('.yx-lock-card').forEach(x=>x.remove());
+    document.querySelectorAll('.yx-lock').forEach(x=>x.classList.remove('yx-lock'));
+  };
+  window.openPlanLock=function(){toast('Payments are OFF for launch. All YUVRYX features are currently FREE.');};
+  window.closePlanLock=function(){const m=document.getElementById('yxLockModal');if(m)m.style.display='none';};
+  function freePlans(){
+    const v=document.getElementById('plans'); if(!v)return;
+    v.querySelectorAll('.yx-status').forEach(x=>{x.textContent='FREE ACCESS';x.className='yx-status open'});
+    v.querySelectorAll('.yx-price b').forEach(x=>x.textContent='₹0');
+    v.querySelectorAll('.yx-price span').forEach(x=>x.textContent='during launch');
+    v.querySelectorAll('.yx-year').forEach(x=>x.textContent='Payments disabled for now');
+    v.querySelectorAll('.yx-plan-btn').forEach((b,i)=>{b.textContent=i===0?'Current free access':'Activate free access';b.classList.add('light');b.onclick=()=>{toast('Free access active — no payment required.');show('home');};});
+    const note=v.querySelector('.yx-plan-note');if(note){note.querySelector('b').textContent='FREE LAUNCH';note.querySelector('span').textContent='All plans and features are open right now';note.querySelector('small').textContent='Payment/subscription integration will be connected only when the owner enables it.';}
+    const hero=v.querySelector('.yx-plan-hero p');if(hero)hero.textContent='All YUVRYX capabilities are available free during the launch phase. The subscription structure stays here for future activation.';
+    const compare=v.querySelectorAll('.yx-compare span');if(compare.length>=3){compare[0].textContent='Everything is free during launch: core tools, study, career, community, groups, tests and services.';compare[1].textContent='Nothing is payment-locked right now. No checkout or payment gateway is active.';compare[2].textContent='The subscription UI remains ready for later; payment will be connected only when you ask.';}
+    const policy=v.querySelector('.yx-plan-note')?.parentElement;
+    v.querySelectorAll('.yx-paid-badge').forEach(x=>{x.textContent='FREE LAUNCH';x.className='yx-free-chip';});
+  }
+
+  function modal(title,body,actions){
+    let m=document.getElementById('yxActionModal');
+    if(!m){m=document.createElement('div');m.id='yxActionModal';m.style.cssText='display:none;position:fixed;inset:0;background:rgba(15,23,42,.62);backdrop-filter:blur(7px);z-index:10001;align-items:center;justify-content:center;padding:16px';m.innerHTML='<div id="yxActionCard" style="width:min(94%,560px);max-height:88vh;overflow:auto;background:#fff;border-radius:22px;padding:22px;box-shadow:0 30px 100px rgba(0,0,0,.28)"><div style="display:flex;justify-content:space-between;gap:12px;align-items:start"><div><div id="yxActionKicker" style="font-size:9px;letter-spacing:.14em;color:#635bff;font-weight:900">YUVRYX</div><h2 id="yxActionTitle" style="margin:5px 0 8px;font-size:22px"></h2></div><button id="yxActionClose" class="btn">✕</button></div><div id="yxActionBody"></div><div id="yxActionActions" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:16px"></div></div>';document.body.appendChild(m);m.onclick=e=>{if(e.target===m)m.style.display='none';};document.getElementById('yxActionClose').onclick=()=>m.style.display='none';}
+    document.getElementById('yxActionTitle').textContent=title;
+    document.getElementById('yxActionBody').innerHTML=body;
+    document.getElementById('yxActionActions').innerHTML=actions||'';
+    m.style.display='flex';
+  }
+  window.yxCloseModal=()=>{const m=document.getElementById('yxActionModal');if(m)m.style.display='none';};
+
+  const cardDetails={
+    'IoT & Robotics':['Build with Arduino, Raspberry Pi, ESP32, sensors and motors.','Open the project-building area and create a real project record.'],
+    'Computers':['Laptop, PC, monitor, SSD, RAM and accessories for student work.','Use the Student Store to build a component list.'],
+    'Lab & Research':['Multimeters, microscopes and measuring equipment for practical work.','Open the Student Store category.'],
+    'Design & Creative':['Drawing tablets, cameras, microphones and lighting for creative projects.','Open the Student Store category.'],
+    '3D Printing':['Printers, filament, resin and prototype supplies.','Open the Student Store category.'],
+    'Frontend Developer':['JavaScript · React · evenings. Team role profile.','Create or send a team request after signing in.'],
+    'ML Learner':['Python · AI/ML · weekends. Team role profile.','Create or send a team request after signing in.'],
+    'UI/UX Designer':['Figma · Design · flexible. Team role profile.','Create or send a team request after signing in.'],
+    'Cybersecurity':['Security · CTF · flexible. Team role profile.','Create or send a team request after signing in.'],
+    'Subjects & Notes':['Manage subjects and open study resources stored in Supabase.','Open the Study workspace.'],
+    'Quizzes & Exams':['Practice, assessment and revision. Attempts can be stored in the quiz system.','Open Surprise Test / assessment area.'],
+    'Study Planner':['Create and track study tasks with due dates.','Open your planner workspace.'],
+    'Academic Tracker':['Track marks, SGPA, CGPA and attendance in your student profile.','Open Student Passport.'],
+    'Weak Topic Detection':['Use your quiz/academic activity to identify topics needing more revision.','Open Progress & Readiness.'],
+    'Exam Tracks':['Create an exam-focused roadmap for JEE, NEET, UPSC, SSC, Banking, GATE, CUET, CLAT, CAT and more.','Open Goals & Tracks.'],
+    'Resumes':['Private resume documents can be organized in the Digital Vault.','Open Digital Vault.'],
+    'Certificates':['Private certificate storage in the Digital Vault.','Open Digital Vault.'],
+    'Mark Sheets':['Private mark-sheet storage in the Digital Vault.','Open Digital Vault.'],
+    'Offer Letters':['Private offer-letter storage in the Digital Vault.','Open Digital Vault.'],
+    'Project Docs':['Private project documents in the Digital Vault.','Open Digital Vault.'],
+    'Access Control':['Private storage is protected by database access policies.','Open Security.'],
+    'CGPA Calculator':['Calculate semester/overall CGPA without leaving YUVRYX.','Use the calculator tool.'],
+    'Attendance Calculator':['Calculate attendance requirements and safe limits.','Use the calculator tool.'],
+    'Pomodoro':['Run focused study sessions directly in YUVRYX.','Start a 25-minute session.'],
+    'Deadline Tracker':['Keep assignments, exams and applications visible.','Open Progress & Readiness.'],
+    'Notes':['Keep quick study notes in one place.','Open Study & Education.'],
+    'Resource Bookmarks':['Save useful learning and career links.','Open Study & Education.']
+  };
+
+  function openTile(tile){
+    const b=tile.querySelector('b');if(!b)return;
+    const title=b.textContent.trim(), d=cardDetails[title]||[tile.innerText.replace(/^\S+\s*/,'').trim(),'This section is now interactive and ready to connect to its backend workflow.'];
+    let action='';
+    if(['Frontend Developer','ML Learner','UI/UX Designer','Cybersecurity'].includes(title)) action='<button class="btn primaryBtn" onclick="yxTeamAction(\''+title.replace(/'/g,"\\'")+'\')">Find matching teammates</button>';
+    else if(title==='IoT & Robotics') action='<button class="btn primaryBtn" onclick="show(\'projects\');yxCloseModal()">Open Project Studio</button>';
+    else if(title==='Subjects & Notes') action='<button class="btn primaryBtn" onclick="yxOpenStudyResources();yxCloseModal()">Open Study Resources</button>';
+    else if(title==='Study Planner') action='<button class="btn primaryBtn" onclick="yxOpenPlanner();yxCloseModal()">Open Planner</button>';
+    else if(title==='Academic Tracker') action='<button class="btn primaryBtn" onclick="show(\'passport\');yxCloseModal()">Open Passport</button>';
+    else if(title==='Access Control') action='<button class="btn primaryBtn" onclick="show(\'security\');yxCloseModal()">Open Security</button>';
+    else if(title==='Resumes'||title==='Certificates'||title==='Mark Sheets'||title==='Offer Letters'||title==='Project Docs') action='<button class="btn primaryBtn" onclick="show(\'vault\');yxCloseModal()">Open Vault</button>';
+    else if(title==='Quizzes & Exams') action='<button class="btn primaryBtn" onclick="show(\'test\');yxCloseModal()">Open Assessments</button>';
+    else if(title==='Exam Tracks') action='<button class="btn primaryBtn" onclick="show(\'goals\');yxCloseModal()">Open Goals</button>';
+    else if(title==='Weak Topic Detection') action='<button class="btn primaryBtn" onclick="show(\'progress\');yxCloseModal()">Open Progress</button>';
+    else action='<button class="btn primaryBtn" onclick="yxCloseModal()">Open</button>';
+    modal(title,'<p style="font-size:12px;line-height:1.7;color:#475467;margin:0">'+esc(d[0])+'</p><div class="card" style="margin-top:12px;background:#f8fafc"><b style="font-size:11px">What happens next</b><p class="muted" style="margin:5px 0 0">'+esc(d[1])+'</p></div>',action);
+  }
+
+  window.yxTeamAction=async function(role){
+    const u=await needUser();if(!u)return;
+    const s=db(); if(!s)return;
+    const {data:profiles,error}=await s.from('team_profiles').select('user_id,availability,preferred_roles,interests,bio').eq('looking_for_team',true).neq('user_id',u.id).limit(20);
+    if(error){toast(error.message);return;}
+    if(!profiles?.length){modal(role+' — teammate search','<p class="muted">No other public team profiles are available yet.</p><p style="font-size:12px">Create your own Team Profile so other students can find you.</p>','<button class="btn primaryBtn" onclick="yxCreateTeamProfile()">Create my team profile</button>');return;}
+    const rows=profiles.map(p=>'<div class="row"><div><b>'+esc((p.preferred_roles||[]).join(' · ')||'Student teammate')+'</b><p>'+esc(p.bio||'Available for collaboration')+' · '+esc(p.availability||'flexible')+'</p><button class="btn" onclick="yxSendTeamRequest(\''+p.user_id+'\',\''+role.replace(/'/g,"\\'")+'\')">Send request</button></div></div>').join('');
+    modal('Matching teammates','<p class="muted">Live team profiles from Supabase.</p>'+rows);
+  };
+  window.yxSendTeamRequest=async function(recipient,role){
+    const u=await needUser();if(!u)return;const s=db();
+    const {error}=await s.from('team_requests').insert({requester_id:u.id,recipient_id:recipient,context:role,status:'pending'});
+    toast(error?error.message:'Team request sent.');
+    if(!error)yxCloseModal();
+  };
+  window.yxCreateTeamProfile=async function(){
+    const u=await needUser();if(!u)return;
+    modal('Create Team Profile','<label style="display:grid;gap:6px;font-size:11px;font-weight:800">Roles <input id="yxRoles" class="yx-benefit-search" placeholder="Frontend, AI/ML, UI/UX"></label><label style="display:grid;gap:6px;margin-top:10px;font-size:11px;font-weight:800">Availability <input id="yxAvail" class="yx-benefit-search" placeholder="Evenings / weekends"></label><label style="display:grid;gap:6px;margin-top:10px;font-size:11px;font-weight:800">Bio <textarea id="yxBio" class="yx-benefit-search" style="min-height:90px" placeholder="What can you build?"></textarea></label>','<button class="btn primaryBtn" onclick="yxSaveTeamProfile()">Save profile</button>');
+  };
+  window.yxSaveTeamProfile=async function(){
+    const u=await needUser();if(!u)return;const s=db();
+    const roles=(document.getElementById('yxRoles').value||'').split(',').map(x=>x.trim()).filter(Boolean);
+    const availability=document.getElementById('yxAvail').value.trim(),bio=document.getElementById('yxBio').value.trim();
+    const {error}=await s.from('team_profiles').upsert({user_id:u.id,looking_for_team:true,availability,preferred_roles:roles,interests:[],bio,visibility:'protected'},{onConflict:'user_id'});
+    toast(error?error.message:'Team profile saved.');if(!error)yxCloseModal();
+  };
+
+  window.yxOpenStudyResources=async function(){
+    const u=await currentUser(),s=db();if(!s)return;
+    const {data:subjects}=await s.from('subjects').select('id,name,code,semester,credits,target_grade').limit(30);
+    const {data:resources}=await s.from('study_resources').select('id,title,resource_type,url,description,is_public,subject_id').eq('is_public',true).limit(30);
+    const sh=(subjects||[]).map(x=>'<div class="row"><div><b>'+esc(x.name)+'</b><p>'+esc(x.code||'')+' · Semester '+esc(x.semester||'')+' · Credits '+esc(x.credits||'')+'</p></div></div>').join('');
+    const rh=(resources||[]).map(x=>'<div class="row"><div><b>'+esc(x.title)+'</b><p>'+esc(x.resource_type)+' · '+esc(x.description||'')+'</p>'+(x.url?'<a href="'+esc(x.url)+'" target="_blank" rel="noopener" class="link">Open resource →</a>':'')+'</div></div>').join('');
+    modal('Study Resources',(u?'<p class="muted">Your live subjects + public resources.</p>':'<p class="muted">Public resources are available. Sign in to manage your subjects.</p>')+'<h3 style="font-size:13px;margin:16px 0 6px">Subjects</h3>'+(sh||'<p class="muted">No subjects added yet.</p>')+'<h3 style="font-size:13px;margin:16px 0 6px">Resources</h3>'+(rh||'<p class="muted">No public resources yet.</p>'));
+  };
+  window.yxOpenPlanner=async function(){
+    const u=await needUser();if(!u)return;const s=db();
+    const {data:tasks}=await s.from('study_tasks').select('id,title,task_type,due_at,completed,priority').eq('user_id',u.id).order('due_at',{ascending:true}).limit(30);
+    const rows=(tasks||[]).map(t=>'<div class="row"><span class="badge">'+(t.completed?'DONE':esc(t.priority||'MED'))+'</span><div><b>'+esc(t.title)+'</b><p>'+esc(t.task_type)+' · '+(t.due_at?new Date(t.due_at).toLocaleString():'No deadline')+'</p></div></div>').join('');
+    modal('Study Planner',(rows||'<p class="muted">No study tasks yet.</p>'),'<button class="btn primaryBtn" onclick="yxAddStudyTask()">+ Add task</button>');
+  };
+  window.yxAddStudyTask=function(){
+    modal('Add study task','<label style="display:grid;gap:6px;font-size:11px;font-weight:800">Task <input id="yxTaskTitle" class="yx-benefit-search" placeholder="DBMS revision"></label><label style="display:grid;gap:6px;margin-top:10px;font-size:11px;font-weight:800">Due date <input id="yxTaskDue" type="datetime-local" class="yx-benefit-search"></label>','<button class="btn primaryBtn" onclick="yxSaveStudyTask()">Save task</button>');
+  };
+  window.yxSaveStudyTask=async function(){
+    const u=await needUser();if(!u)return;const s=db(),title=document.getElementById('yxTaskTitle').value.trim(),due=document.getElementById('yxTaskDue').value;
+    if(!title){toast('Task title is required.');return;}
+    const {error}=await s.from('study_tasks').insert({user_id:u.id,title,task_type:'study',due_at:due?new Date(due).toISOString():null,priority:'medium'});
+    toast(error?error.message:'Study task added.');if(!error)yxOpenPlanner();
+  };
+
+  /* Real group chat: after Join, open the room and persist messages. */
+  async function openGroup(id){
+    const u=await needUser();if(!u)return;const s=db();if(!s)return;
+    const {data:msgs,error}=await s.from('study_messages').select('id,user_id,content,created_at').eq('group_id',id).order('created_at',{ascending:true}).limit(100);
+    if(error){toast(error.message);return;}
+    const rows=(msgs||[]).map(m=>'<div class="row"><div><b>'+(m.user_id===u.id?'You':'Student')+'</b><p>'+esc(m.content)+'</p><small class="muted">'+new Date(m.created_at).toLocaleString()+'</small></div></div>').join('');
+    modal('Study Group Chat','<div style="max-height:360px;overflow:auto">'+(rows||'<p class="muted">No messages yet. Start the discussion.</p>')+'</div><textarea id="yxGroupMsg" class="yx-benefit-search" style="margin-top:10px;min-height:80px" placeholder="Write a message..."></textarea>','<button class="btn primaryBtn" onclick="yxSendGroupMessage(\''+id+'\')">Send message</button>');
+  }
+  window.yxOpenGroup=openGroup;
+  window.yxSendGroupMessage=async function(id){
+    const u=await needUser();if(!u)return;const content=(document.getElementById('yxGroupMsg')?.value||'').trim();if(!content)return toast('Write a message first.');const {error}=await db().from('study_messages').insert({group_id:id,user_id:u.id,content});toast(error?error.message:'Message sent.');if(!error)openGroup(id);
+  };
+  const oldJoin=window.yxJoinGroup;
+  if(oldJoin)window.yxJoinGroup=async function(id){const result=await oldJoin(id);if(!String(result||'').includes('error'))setTimeout(()=>openGroup(id),250);};
+  window.yxOpenGroupFromTile=function(tile){
+    const btn=tile.querySelector('button[onclick*="yxJoinGroup"]');if(!btn)return;
+    const m=(btn.getAttribute('onclick')||'').match(/yxJoinGroup\('([^']+)'\)/);if(m)openGroup(m[1]);
+  };
+
+  /* Make every visible tile/card genuinely touchable instead of dead UI. */
+  function wireTiles(){
+    document.querySelectorAll('.tile').forEach(t=>{
+      if(t.dataset.yxInteractive)return;
+      t.dataset.yxInteractive='1';
+      t.style.cursor='pointer';
+      t.setAttribute('role','button');
+      t.addEventListener('click',function(e){
+        if(e.target.closest('button,a,input,textarea,select'))return;
+        if(this.closest('#group')){window.yxOpenGroupFromTile(this);return;}
+        openTile(this);
+      });
+    });
+  }
+  window.addEventListener('load',()=>{freePlans();window.applyPaidLocks();wireTiles();setTimeout(wireTiles,900);});
+  const obs=new MutationObserver(()=>{freePlans();window.applyPaidLocks();wireTiles();});
+  obs.observe(document.body,{childList:true,subtree:true});
+
+  /* Stop generic fake "ready to configure" feedback from firing on new interactive controls. */
+  const oldToast=window.toast;
+  window.toast=function(m){if(m&&/ready to configure/i.test(m))m='This feature is being opened…';return oldToast?oldToast(m):undefined;};
+})();
+</script>
 </body>
