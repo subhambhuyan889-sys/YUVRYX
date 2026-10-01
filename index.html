@@ -18,6 +18,9 @@ html,body{max-width:100%;overflow-x:hidden} body.yx-auth-locked .app{display:non
 .store{background:linear-gradient(135deg,#101828,#312e81);color:#fff;border-radius:20px;padding:22px;margin-bottom:15px}.store h3{font-size:24px;margin:5px 0}.store p{color:#d0d5dd;max-width:750px;font-size:12px;line-height:1.55}.store .secondary{background:rgba(255,255,255,.1)}
 .release{border-left:3px solid var(--brand);padding-left:12px}.release b{font-size:12px}.release p{font-size:10px;color:var(--muted);margin:3px 0}
 .mobile{display:none}
+#yxMobileOverlay{display:none;position:fixed;inset:0;background:rgba(15,23,42,.48);backdrop-filter:blur(2px);z-index:25}
+#yxMobileOverlay.open{display:block}
+@media(max-width:720px){body.yx-menu-open{overflow:hidden}.side{z-index:40}.top{z-index:20}}
 @media(max-width:1050px){.side{width:225px}.main{margin-left:225px;width:calc(100% - 225px)}.s3{grid-column:span 6}.s4,.s5,.s6,.s7,.s8{grid-column:span 12}.tiles{grid-template-columns:1fr 1fr}}
 @media(max-width:720px){.side{transform:translateX(-100%);transition:.25s;width:280px}.side.open{transform:none}.main{margin-left:0;width:100%}.mobile{display:block}.top{padding:0 13px}.search{width:45%}.content{padding:18px 13px}.hero{padding:22px}.hero h1{font-size:28px}.scoreCircle{width:105px;height:105px}.scoreCircle b{font-size:28px}.s3,.s4,.s5,.s6,.s7,.s8,.s12{grid-column:span 12}.tiles{grid-template-columns:1fr}.topright .hide{display:none}}
 
@@ -120,8 +123,9 @@ html{scroll-behavior:smooth}
  </nav>
  <div class="sideBottom"><div class="plan"><small>Current plan</small><div style="font-weight:850;margin-top:3px">FREE · ₹0</div><button onclick="show('plans')">See all benefits →</button></div></div>
 </aside>
+<div id="yxMobileOverlay" aria-hidden="true"></div>
 <main class="main">
-<header class="top"><div style="display:flex;gap:8px;align-items:center;width:100%"><button class="icon mobile" onclick="side.classList.toggle('open')">☰</button><div class="search">⌕<input id="search" placeholder="Search YUVRYX..." oninput="toastSearch(this.value)"></div></div><div class="topright"><button class="icon" onclick="toast('No new notifications')">♢</button><button class="icon hide" onclick="toast('Help center')">?</button><button class="yx-auth-top" id="yxAuthTop" onclick="openAuth()">Sign in</button><button class="avatar" id="yxAvatar" onclick="openAuth()" aria-label="Account">Y</button></div></header>
+<header class="top"><div style="display:flex;gap:8px;align-items:center;width:100%"><button class="icon mobile" id="yxMenuButton" aria-label="Open menu" aria-expanded="false">☰</button><div class="search">⌕<input id="search" placeholder="Search YUVRYX..." oninput="toastSearch(this.value)"></div></div><div class="topright"><button class="icon" onclick="toast('No new notifications')">♢</button><button class="icon hide" onclick="toast('Help center')">?</button><button class="yx-auth-top" id="yxAuthTop" onclick="openAuth()">Sign in</button><button class="avatar" id="yxAvatar" onclick="openAuth()" aria-label="Account">Y</button></div></header>
 <section class="content">
 
 <div class="view active" id="home">
@@ -215,7 +219,13 @@ html{scroll-behavior:smooth}
 <div id="toast" style="position:fixed;right:20px;bottom:20px;background:#111827;color:#fff;padding:12px 15px;border-radius:11px;font-size:11px;opacity:0;transform:translateY(20px);transition:.25s;z-index:100"></div>
 <script>
 const views=[...document.querySelectorAll('.view')], side=document.getElementById('side'), toastBox=document.getElementById('toast');
-function show(id){const target=document.getElementById(id);if(!target)return;views.forEach(v=>v.classList.remove('active'));target.classList.add('active');document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('active',b.dataset.v===id));if(side)side.classList.remove('open');window.scrollTo({top:0,behavior:'smooth'});if(id==='champions'&&typeof renderLeaderboard==='function')renderLeaderboard();return false;} window.show=show;
+const mobileOverlay=document.getElementById('yxMobileOverlay'),menuButton=document.getElementById('yxMenuButton');
+function closeMobileMenu(){if(side)side.classList.remove('open');if(mobileOverlay)mobileOverlay.classList.remove('open');document.body.classList.remove('yx-menu-open');if(menuButton)menuButton.setAttribute('aria-expanded','false')}
+function openMobileMenu(){if(side)side.classList.add('open');if(mobileOverlay)mobileOverlay.classList.add('open');document.body.classList.add('yx-menu-open');if(menuButton)menuButton.setAttribute('aria-expanded','true')}
+function toggleMobileMenu(){side?.classList.contains('open')?closeMobileMenu():openMobileMenu()}
+menuButton?.addEventListener('click',toggleMobileMenu);mobileOverlay?.addEventListener('click',closeMobileMenu);
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeMobileMenu();window.yxCloseFeature?.();window.closePlanLock?.()}})
+function show(id){const target=document.getElementById(id);if(!target)return;views.forEach(v=>v.classList.remove('active'));target.classList.add('active');document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('active',b.dataset.v===id));closeMobileMenu();window.scrollTo({top:0,behavior:'smooth'});if(id==='champions'&&typeof renderLeaderboard==='function')renderLeaderboard();return false;} window.show=show;
 document.querySelectorAll('.nav button[data-v]').forEach(b=>{b.type='button';b.addEventListener('click',function(e){e.preventDefault();window.location.hash=this.dataset.v;show(this.dataset.v);});}); window.addEventListener('hashchange',()=>{const id=location.hash.slice(1);if(id&&document.getElementById(id))show(id)});
 function toast(m){toastBox.textContent=m;toastBox.style.opacity=1;toastBox.style.transform='none';clearTimeout(window.tt);window.tt=setTimeout(()=>{toastBox.style.opacity=0;toastBox.style.transform='translateY(20px)'},2200)}
 function toastSearch(q){if(q.trim().length>2)toast('Searching YUVRYX for “'+q+'”…')}
