@@ -202,7 +202,7 @@ html{scroll-behavior:smooth}
 
 <div class="view" id="tools"><div class="title"><div><div class="eyebrow">Toolkit</div><h2>Tools & Resources</h2><p>Small utilities that save time.</p></div></div><div class="tiles"><div class="tile">🧮<b>CGPA Calculator</b><p>Semester and overall calculations.</p></div><div class="tile">📊<b>Attendance Calculator</b><p>Plan attendance requirements.</p></div><div class="tile">⏱️<b>Pomodoro</b><p>Focused study sessions.</p></div><div class="tile">📅<b>Deadline Tracker</b><p>Keep important dates visible.</p></div><div class="tile">📝<b>Notes</b><p>Quick student notes.</p></div><div class="tile">🔖<b>Resource Bookmarks</b><p>Save useful resources.</p></div></div></div>
 
-<div class="view" id="benefits"><div class="title"><div><div class="eyeb">Simple pricing · more value as you grow</div><h2>Plans & Benefits</h2><p>Start free. Upgrade only when you need more. Paid benefits stay locked until a valid subscription is active.</p></div><span class="pill"><span class="dot"></span>Free-first</span></div><div class="yx-plan-hero"><div><span class="yx-kicker">YUVRYX MEMBERSHIP</span><h2>Choose the level that matches your journey.</h2><p>Every plan is designed around useful outcomes—not a wall of confusing features. Yearly plans are priced for students who want more value over time.</p></div><div class="yx-plan-note"><b>7-day Basic trial</b><span>Starts after email verification</span><small>Advanced & Premium remain locked until subscribed</small></div></div><div class="yx-plans"><article class="yx-plan free"><div class="yx-plan-top"><div><span class="yx-plan-tag">FREE</span><h3>Free</h3><p>For getting started.</p></div><span class="yx-status open">OPEN</span></div><div class="yx-price"><b>₹0</b><span>forever</span></div><ul><li>Basic YUVRYX AI</li><li>Student Passport</li><li>Tasks, calendar & reminders</li><li>Basic goals & progress</li><li>CGPA & attendance tools</li><li>Basic resources & bookmarks</li></ul><button class="yx-plan-btn light">Current plan</button></article><article class="yx-plan"><div class="yx-plan-top"><div><span class="yx-plan-tag">BASIC</span><h3>Basic</h3><p>For serious student progress.</p></div><span class="yx-status locked">LOCKED</span></div><div class="yx-price"><b>₹0</b><span>during launch</span></div><div class="yx-year">Payments disabled for now</div><ul><li>Career & internship discovery</li><li>Saved opportunities & tracker</li><li>Study Hub & quizzes</li><li>Skill roadmaps & projects</li><li>Scholarships & Backlog Support</li><li>Student Life planning</li></ul><button class="yx-plan-btn" onclick="openPlanLock('Basic')">🔒 Unlock Basic</button></article><article class="yx-plan featured"><div class="popular">MOST CAPABLE</div><div class="yx-plan-top"><div><span class="yx-plan-tag">ADVANCED</span><h3>Advanced</h3><p>For building a stronger career profile.</p></div><span class="yx-status locked">LOCKED</span></div><div class="yx-price"><b>₹0</b><span>during launch</span></div><div class="yx-year">Payments disabled for now</div><ul><li>Advanced opportunity matching</li><li>Skill-gap & readiness intelligence</li><li>ATS & resume analysis</li><li>Why Not Eligible? guidance</li><li>AI Doubt Solver & revision tools</li><li>GitHub, portfolio & rejection review</li></ul><button class="yx-plan-btn" onclick="openPlanLock('Advanced')">🔒 Unlock Advanced</button></article><article class="yx-plan premium"><div class="yx-plan-top"><div><span class="yx-plan-tag">PREMIUM</span><h3>Premium</h3><p>For the full YUVRYX experience.</p></div><span class="yx-status locked">LOCKED</span></div><div class="yx-price"><b>₹0</b><span>during launch</span></div><div class="yx-year">Payments disabled for now</div><ul><li>YUVRYX Career & Study Assistant</li><li>Application Copilot & AI Resume Builder</li><li>Mock Interview & feedback</li><li>Career Path Simulator</li><li>Advanced Project Mentor</li><li>Premium alerts, analytics & reports</li></ul><button class="yx-plan-btn" onclick="openPlanLock('Premium')">🔒 Unlock Premium</button></article></div><div class="yx-compare"><div><b>What stays free?</b><span>Core account, basic tools, Passport and essential planning remain available.</span></div><div><b>What is locked?</b><span>Nothing is payment-locked during launch. All currently implemented features are free.</span></div><div><b>What about yearly?</b><span>Yearly options are shown beside every paid plan for simpler comparison.</span></div></div><div class="card" style="margin-top:16px"><div class="head"><h3>Plan access policy</h3><span class="yx-free-chip">FREE LAUNCH</span></div><p class="muted">Payment is intentionally disabled for launch. No checkout is connected. Subscription enforcement will be activated only when the owner requests it.</p></div></div><div class="view" id="profile"><div class="title"><div><div class="eyebrow">Account</div><h2>Profile</h2><p>Manage your student identity and preferences.</p></div></div><div class="card"><h3>Guddu</h3><p class="muted">Email verified · Free plan · Student Passport connected</p><button class="btn primaryBtn" onclick="toast('Profile saved')">Save profile</button></div></div>
+<div class="view" id="profile"><div class="title"><div><div class="eyebrow">Account</div><h2>Profile</h2><p>Manage your student identity and preferences.</p></div></div><div class="card"><h3>Guddu</h3><p class="muted">Email verified · Free plan · Student Passport connected</p><button class="btn primaryBtn" onclick="toast('Profile saved')">Save profile</button></div></div>
 <div class="view" id="security"><div class="title"><div><div class="eyebrow">Protected</div><h2>Security & Privacy</h2><p>Authentication, private data, access controls and account protection.</p></div></div><div class="card"><h3>Security status</h3><p class="muted">Email verification · Private student data · Role protection · Secure access policies.</p></div></div>
 
 </section></main></div>
@@ -230,13 +230,6 @@ document.querySelectorAll('.nav button[data-v]').forEach(b=>{b.type='button';b.a
 function toast(m){toastBox.textContent=m;toastBox.style.opacity=1;toastBox.style.transform='none';clearTimeout(window.tt);window.tt=setTimeout(()=>{toastBox.style.opacity=0;toastBox.style.transform='translateY(20px)'},2200)}
 function toastSearch(q){if(q.trim().length>2)toast('Searching YUVRYX for “'+q+'”…')}
 
-// Stable interaction fallback: buttons without an action give feedback instead of appearing dead.
-document.addEventListener('click', function(e){
-  const b=e.target.closest('button');
-  if(!b || b.dataset.v || b.getAttribute('onclick') || b.type==='submit') return;
-  const label=(b.textContent||'').trim();
-  if(label) toast(label.replace(/[→+🔒]/g,'').trim()+' is ready to configure.');
-});
 
 let yxAIConversationId=null;
 async function ask(){
@@ -257,29 +250,6 @@ async function ask(){
 const studentNames=["Aarav","Ananya","Rohan","Priya","Aditya","Sneha","Rahul","Isha","Arjun","Meera","Karan","Diya","Vivek","Neha","Yash","Kavya","Manish","Riya","Sahil","Pooja","Nikhil","Aditi","Harsh","Simran","Varun","Tanya","Dev","Muskan","Aman","Shreya","Akash","Nandini","Ayush","Sakshi","Ritwik","Anjali","Abhishek","Palak","Mohit","Sanya","Raj","Avni","Vikram","Mahi","Rajat","Khushi","Tanmay","Navya","Kabir","Tina"];
 function renderLeaderboard(){const box=document.getElementById('leaderboard');if(!box)return;let s='<div class="rankrow headr"><span>Rank</span><span>Student</span><span>Score</span><span>Trend</span></div>';studentNames.forEach((n,i)=>{let score=(97.8-i*.34+(i%5)*.07).toFixed(1);let tr=i%5===0?'↑':i%7===0?'↓':'—';s+=`<div class="rankrow"><b>#${i+1}</b><span>${n}</span><b>${score}</b><span>${tr}</span></div>`});box.innerHTML=s}
 renderLeaderboard();setInterval(()=>{if(document.getElementById('champions').classList.contains('active'))renderLeaderboard()},30000);
-function openPlanLock(plan){
- const m=document.getElementById('yxLockModal');
- document.getElementById('yxLockTitle').textContent=plan+' plan is locked';
- document.getElementById('yxLockText').textContent='This is a paid YUVRYX capability. Choose the '+plan+' plan from Plans & Benefits to unlock it. No paid feature is being activated by a demo click.';
- m.style.display='flex';
-}
-function closePlanLock(){document.getElementById('yxLockModal').style.display='none'}
-document.getElementById('yxLockModal')?.addEventListener('click',function(e){if(e.target===this)closePlanLock()});
-const paidViews=new Set(['group','test']);
-function applyPaidLocks(){
- paidViews.forEach(id=>{
-  const v=document.getElementById(id); if(!v||v.querySelector('.yx-lock-card'))return;
-  v.classList.add('yx-lock');
-  const c=document.createElement('div'); c.className='yx-lock-card';
-  c.innerHTML='<div class="lockicon">🔒</div><span class="yx-paid-badge">Paid plan required</span><h3>'+ (id==='group'?'Group Study':'Surprise Test') +' is locked</h3><p>Free users can explore YUVRYX, while this capability requires an eligible paid plan. Upgrade to unlock the full experience.</p><button class="btn primaryBtn" onclick="show(\'plans\')">View Plans & Benefits</button>';
-  v.appendChild(c);
- });
-}
-function filterYxBenefits(q){
- q=(q||'').toLowerCase().trim();
- document.querySelectorAll('#yxBenefitGrid .yx-benefit').forEach(el=>{el.style.display=!q||el.dataset.benefit.includes(q)?'block':'none'});
-}
-applyPaidLocks();
 const startupView=location.hash.slice(1); if(startupView && document.getElementById(startupView)) show(startupView); else show('home');
 
 function filterBenefits(q){const x=(q||'').toLowerCase().trim();document.querySelectorAll('#benefitGrid .yx-benefit').forEach(el=>{el.style.display=!x||el.dataset.benefit.includes(x)?'block':'none';});}
@@ -818,7 +788,7 @@ function filterBenefits(q){const x=(q||'').toLowerCase().trim();document.querySe
     document.querySelectorAll('.yx-lock-card').forEach(x=>x.remove());
     document.querySelectorAll('.yx-lock').forEach(x=>x.classList.remove('yx-lock'));
   };
-  window.openPlanLock=function(){toast('Payments are OFF for launch. All YUVRYX features are currently FREE.');};
+  window.openPlanLock=function(){toast('All implemented YUVRYX features are currently FREE.');};
   window.closePlanLock=function(){const m=document.getElementById('yxLockModal');if(m)m.style.display='none';};
   function freePlans(){
     const v=document.getElementById('plans'); if(!v)return;
@@ -1005,14 +975,12 @@ function filterBenefits(q){const x=(q||'').toLowerCase().trim();document.querySe
       });
     });
   }
-  window.addEventListener('load',()=>{freePlans();window.applyPaidLocks();wireTiles();setTimeout(wireTiles,900);});
+  window.addEventListener('load',()=>{window.applyPaidLocks();wireTiles();setTimeout(wireTiles,900);});
   const obs=new MutationObserver(()=>{window.applyPaidLocks();wireTiles();});
   obs.observe(document.body,{childList:true,subtree:true});
-  setInterval(()=>{if(document.getElementById('plans')?.classList.contains('active'))freePlans();},1500);
+  
 
-  /* Stop generic fake "ready to configure" feedback from firing on new interactive controls. */
-  const oldToast=window.toast;
-  window.toast=function(m){if(m&&/ready to configure/i.test(m))m='This feature is being opened…';return oldToast?oldToast(m):undefined;};
+  
 })();
 </script>
 </body>
