@@ -774,37 +774,6 @@ function filterBenefits(q){const x=(q||'').toLowerCase().trim();document.querySe
   function currentUser(){return db()?.auth.getSession().then(x=>x.data.session?.user||null);}
   function needUser(){return currentUser().then(u=>{if(!u){if(typeof openAuth==='function')openAuth();toast('Please sign in first.');}return u;});}
 
-  /* LAUNCH MODE: payments/subscription enforcement are intentionally disabled. */
-  window.applyPaidLocks=function(){
-    document.querySelectorAll('.yx-lock-card').forEach(x=>x.remove());
-    document.querySelectorAll('.yx-lock').forEach(x=>x.classList.remove('yx-lock'));
-  };
-  window.openPlanLock=function(){toast('All implemented YUVRYX features are currently FREE.');};
-  window.closePlanLock=function(){const m=document.getElementById('yxLockModal');if(m)m.style.display='none';};
-  function freePlans(){
-    const v=document.getElementById('plans'); if(!v)return;
-    v.querySelectorAll('.yx-status').forEach(x=>{x.textContent='FREE ACCESS';x.className='yx-status open'});
-    v.querySelectorAll('.yx-price b').forEach(x=>x.textContent='₹0');
-    v.querySelectorAll('.yx-price span').forEach(x=>x.textContent='during launch');
-    v.querySelectorAll('.yx-year').forEach(x=>x.textContent='Payments disabled for now');
-    v.querySelectorAll('.yx-plan-btn').forEach((b,i)=>{b.textContent=i===0?'Current free access':'Activate free access';b.classList.add('light');b.onclick=()=>{toast('Free access active — no payment required.');show('home');};});
-    const note=v.querySelector('.yx-plan-note');if(note){note.querySelector('b').textContent='FREE LAUNCH';note.querySelector('span').textContent='All plans and features are open right now';note.querySelector('small').textContent='Payment/subscription integration will be connected only when the owner enables it.';}
-    const hero=v.querySelector('.yx-plan-hero p');if(hero)hero.textContent='All YUVRYX capabilities are available free during the launch phase. The subscription structure stays here for future activation.';
-    const compare=v.querySelectorAll('.yx-compare span');if(compare.length>=3){compare[0].textContent='Everything is free during launch: core tools, study, career, community, groups, tests and services.';compare[1].textContent='Nothing is payment-locked right now. No checkout or payment gateway is active.';compare[2].textContent='The subscription UI remains ready for later; payment will be connected only when you ask.';}
-    const policy=v.querySelector('.yx-plan-note')?.parentElement;
-    v.querySelectorAll('.yx-paid-badge').forEach(x=>{x.textContent='FREE LAUNCH';x.className='yx-free-chip';});
-  }
-
-  function modal(title,body,actions){
-    let m=document.getElementById('yxActionModal');
-    if(!m){m=document.createElement('div');m.id='yxActionModal';m.style.cssText='display:none;position:fixed;inset:0;background:rgba(15,23,42,.62);backdrop-filter:blur(7px);z-index:10001;align-items:center;justify-content:center;padding:16px';m.innerHTML='<div id="yxActionCard" style="width:min(94%,560px);max-height:88vh;overflow:auto;background:#fff;border-radius:22px;padding:22px;box-shadow:0 30px 100px rgba(0,0,0,.28)"><div style="display:flex;justify-content:space-between;gap:12px;align-items:start"><div><div id="yxActionKicker" style="font-size:9px;letter-spacing:.14em;color:#635bff;font-weight:900">YUVRYX</div><h2 id="yxActionTitle" style="margin:5px 0 8px;font-size:22px"></h2></div><button id="yxActionClose" class="btn">✕</button></div><div id="yxActionBody"></div><div id="yxActionActions" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:16px"></div></div>';document.body.appendChild(m);m.onclick=e=>{if(e.target===m)m.style.display='none';};document.getElementById('yxActionClose').onclick=()=>m.style.display='none';}
-    document.getElementById('yxActionTitle').textContent=title;
-    document.getElementById('yxActionBody').innerHTML=body;
-    document.getElementById('yxActionActions').innerHTML=actions||'';
-    m.style.display='flex';
-  }
-  window.yxCloseModal=()=>{const m=document.getElementById('yxActionModal');if(m)m.style.display='none';};
-
   const cardDetails={
     'IoT & Robotics':['Build with Arduino, Raspberry Pi, ESP32, sensors and motors.','Open the project-building area and create a real project record.'],
     'Computers':['Laptop, PC, monitor, SSD, RAM and accessories for student work.','Use the Student Store to build a component list.'],
@@ -966,8 +935,8 @@ function filterBenefits(q){const x=(q||'').toLowerCase().trim();document.querySe
       });
     });
   }
-  window.addEventListener('load',()=>{window.applyPaidLocks();wireTiles();setTimeout(wireTiles,900);});
-  const obs=new MutationObserver(()=>{window.applyPaidLocks();wireTiles();});
+  window.addEventListener('load',()=>{wireTiles();setTimeout(wireTiles,900);});
+  const obs=new MutationObserver(()=>{wireTiles();});
   obs.observe(document.body,{childList:true,subtree:true});
   
 
